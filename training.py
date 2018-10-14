@@ -3,11 +3,15 @@ Created on Oct 10th, 2018
 @author: Rio Li
 '''
 
+from cvxopt import matrix
+from cvxopt import solvers
 import numpy as np
 from numpy.dual import inv
 import matplotlib.pyplot as plt
+
 from os import path
 import logging
+
 from regressions import*
 
 # generate a matrix with each column is a polynomial of x
@@ -38,27 +42,29 @@ def train_LS(xs, ys, xp, yp, order):
     theta_ls =  inv(x_train.dot(x_train.T)).dot(x_train).dot(y_train) # use sample x and sample y to obtain theta
     y_ls = x_test.T.dot(theta_ls)  # use the obtained theta on test x to obtain predictor new_y 
     mse = mean_square_error(y_test, y_ls)  # calculate the error between actual y and new_y
-    plt.plot(xp, y_ls, color = 'b', label='least square')
+    plt.plot(xp, y_ls, color = 'b', label='LS')
     
 
     #---------------------------------Regularised Least Squre---------------------------------#
     theta_rls =  inv(x_train.dot(x_train.T)+ 1).dot(x_train).dot(y_train)
     y_rls = x_test.T.dot(theta_rls) 
     mse_rls = mean_square_error(y_test, y_rls) 
-    plt.plot(xp, y_rls, color = 'g', label='Regularised least square')
+    plt.plot(xp, y_rls, color = 'g', label='RLS')
     
     #---------------------------------LassoRegression---------------------------------#
 
     #---------------------------------RobustRegression---------------------------------#
 
     #---------------------------------BayesianRegression---------------------------------#
-    # alpha = 0.48
-    # beta = 1
-    # theta_sigma = inv((1/alpha) * np.identity(x_train.shape[0]) + (1/beta) * np.dot(x_train, x_train.T))
-    # theta_mu = (1/beta )* np.dot(theta_sigma, np.dot(x_train, y_train))
-    # y_beyesian = x_train.T.dot(theta_mu)
-    # mse_rls = mean_square_error(y_test, y_beyesian)
-    # plt.plot(xp, y_beyesian, color = 'r', label='regressions')
+    alpha = 0.48
+    sigma = 1
+    # rxr
+    theta_sigma = inv((1/alpha) * np.identity(x_train.shape[0]) + (1/sigma) * np.dot(x_train, x_train.T))
+    theta_mu = (1/sigma)* np.dot(theta_sigma, np.dot(x_train, y_train)) # rxr
+    y_beyesian = x_test.T.dot(theta_mu)
+    print(y_beyesian.shape)
+    mse_rls = mean_square_error(y_test, y_beyesian)
+    plt.plot(xp, y_beyesian, color = 'k', label='Bayesian')
 
 
     #---------------------------------Plot---------------------------------#
