@@ -54,6 +54,12 @@ def train_LS(xs, ys, xp, yp, order):
     #---------------------------------LassoRegression---------------------------------#
 
     #---------------------------------RobustRegression---------------------------------#
+    rownum = x_train.shape[0]
+    colnum = x_train.shape[1]
+    zero_row = [0 for i in range(rownum)]
+    one_col = [0 for i in range(colnum)]
+    c = matrix(np.array(zero_row + one_col))
+
 
     #---------------------------------BayesianRegression---------------------------------#
     alpha = 0.48
